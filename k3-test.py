@@ -1,7 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 from datetime import datetime as dt
 import numpy as np
+
 pd.plotting.register_matplotlib_converters()
 
 
@@ -134,20 +136,23 @@ def kthree(sales_data_doc, salesperson_doc):
 
 def plot_kthree(team, rep, sales_data_doc, salesperson_doc):
 
+    df = kthree(sales_data_doc, salesperson_doc)
+    #df['Date'] = df['Date'].apply(lambda x: dt.strftime(x, '%y-%b'))
+
     # creates pivot tables summarising kthree data set
-    no_k3_pivot = pd.pivot_table(kthree(sales_data_doc, salesperson_doc),
+    no_k3_pivot = pd.pivot_table(df,
                                  values='cp',
                                  index='Date',
                                  columns=['Team', 'Salesperson', 'K3 status'],
                                  aggfunc='count')
 
-    ave_profit_pivot = pd.pivot_table(kthree(sales_data_doc, salesperson_doc),
+    ave_profit_pivot = pd.pivot_table(df,
                                       values='annualised profit',
                                       index='Date',
                                       columns=['Team', 'Salesperson', 'K3 status'],
                                       aggfunc='mean')
 
-    # creates data frames that are slices of the no_k3_pivot and ave_profit_pivot based on the salesperson
+    # creates dataframes that are slices of the no_k3_pivot and ave_profit_pivot based on the salesperson
     count_section = no_k3_pivot.iloc[:, no_k3_pivot.columns.get_level_values(1) == rep].tail(12)
     count_total = no_k3_pivot.iloc[:, no_k3_pivot.columns.get_level_values(1) == rep].tail(12)
     ap_section = ave_profit_pivot.iloc[:, ave_profit_pivot.columns.get_level_values(1) == rep].tail(12)
@@ -160,14 +165,13 @@ def plot_kthree(team, rep, sales_data_doc, salesperson_doc):
     fig = plt.figure()
     fig.set_size_inches(15, 10)
     fig.suptitle(rep, fontsize=20)
+    plt.style.use('fivethirtyeight')
 
     # creates a list of the data frames that each graph is based upon
     ax_data = [count_section,
                ap_section,
                count_total[(team, rep, 'combined')],
                ap_total[(team, rep, 'combined')]]
-
-    print('ax_data', ax_data)
 
     # iterates through the items in ax_data and creates a plot for each item.
     for i, data in enumerate(ax_data):
@@ -201,6 +205,9 @@ def plot_kthree(team, rep, sales_data_doc, salesperson_doc):
             plt.xticks(data.index, rotation=45)
 
     plt.show()
+    
+    print(type(fig))
+    
     return fig
 
 
@@ -217,7 +224,6 @@ def create_table(team, rep, sales_data_doc, salesperson_doc):
                                 aggfunc='mean')
 
     sorted_df = highest_gp.sort_values(by=[('BWC', 'Lachlan')], ascending=False)
-    print(sorted_df)
 
     fig, ax = plt.subplots()
     ax.axis('tight')
@@ -321,8 +327,9 @@ def new_accounts(sales_data_doc, salesperson_doc):
 
     return
 
-# kthree("Sales data test 2.0.xlsx", 'Rep and team.xlsx')
-# create_table('BWC', 'Lachlan', "Sales data test 2.0.xlsx", 'Rep and team.xlsx')
-# plot_kthree('BWC', 'Lachlan', "Sales data test 2.0.xlsx", 'Rep and team.xlsx')
-# plot_totals("Sales data test 2.0.xlsx", 'Rep and team.xlsx')
-new_accounts("Sales data test 2.0.xlsx", 'Rep and team.xlsx')
+# kthree("salesdata.xlsx", 'salesperson-info.xlsx')
+# create_table('BWC', 'Lachlan', "salesdata.xlsx", 'salesperson-info.xlsx')
+plot_kthree('BWC', 'Lachlan', "salesdata.xlsx", 'salesperson-info.xlsx')
+# plot_totals("salesdata.xlsx", 'salesperson-info.xlsx')
+# new_accounts("salesdata.xlsx", 'salesperson-info.xlsx')
+# choose_salesperson_team('salesperson-info.xlsx')
