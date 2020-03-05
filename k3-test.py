@@ -207,7 +207,7 @@ def plot_kthree(team, rep, sales_data_doc, salesperson_doc):
     plt.show()
     
     print(type(fig))
-    
+
     return fig
 
 
@@ -272,7 +272,6 @@ def plot_totals(sales_data_doc, salesperson_doc):
     # initiate plot figure
     fig = plt.figure()
     fig.set_size_inches(15, 10)
-    # fig.suptitle(rep, fontsize=20)
 
     for i, data in enumerate(ax_data):
         i += 1
